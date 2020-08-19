@@ -1,6 +1,6 @@
 name: Sample Test Run with vscode
 
-# Token gets reset
+
 on:
   push:
     branches: [ master ]
