@@ -1,0 +1,49 @@
+name: Sample Test Run with vscode
+
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+
+    - name: kubectl
+      run: |
+        echo 'source <(kubectl completion bash)' >>~/.bashrc
+        echo 'alias k=kubectl' >>/home/runner/.bashrc
+        echo 'complete -F __start_kubectl k' >>/home/runner/.bashrc
+        echo 'PATH="${PATH}:${HOME}/.krew/bin"'>>/home/runner/.bashrc
+        sudo -i -u runner ${GITHUB_WORKSPACE}/install_krew.sh 
+        git clone https://github.com/TacoMonk/dotfiles.git
+        cd dotfiles/
+        make kind
+        make gitKind
+        cd kind
+        make cert-manager 
+  
+  
+    - name: extra utils
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y tshark
+        wget https://storage.googleapis.com/montco-stats/ms-vscode-remote.vscode-remote-extensionpack-0.20.0.vsix
+        wget https://storage.googleapis.com/montco-stats/ms-vscode-remote.remote-ssh-edit-0.51.0.vsix
+        wget https://github.com/vmware-tanzu/octant/releases/download/v0.14.0/octant_0.14.0_Linux-64bit.tar.gz
+        tar -xzf octant_0.14.0_Linux-64bit.tar.gz
+        sudo mv octant_0.14.0_Linux-64bit/octant /usr/local/bin
+    
+    
+    - uses: mchirico/vscode-action@v1
+      with:
+        ngrok_token: ${{ secrets.NGROK_TOKEN }}
+        vscode_port: 8779
+        wait_duration: 17hr
