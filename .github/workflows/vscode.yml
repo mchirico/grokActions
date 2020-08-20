@@ -1,6 +1,5 @@
 name: Sample Test Run with vscode
 
-
 on:
   push:
     branches: [ master ]
